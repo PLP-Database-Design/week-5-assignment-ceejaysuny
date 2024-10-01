@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Healthcare Data Viewer</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    h1 {
+      text-align: center;
+    }
+    button {
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+  <!-- Include Axios from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+  <h1>Healthcare Data Viewer</h1>
+
+  <div style="text-align: center;">
+    <button onclick="fetchPatients()">View Patients</button>
+    <button onclick="fetchProviders()">View Providers</button>
+    <button onclick="fetchProvidersBySpecialty()">View Providers by Specialty</button>
+    <button onclick="fetchPatientCountByFirstName()">View Patient Count by First Name</button>
+  </div>
+
+  <div id="data-output"></div>
+
+  <script>
+    // Function to fetch patients
+    function fetchPatients() {
+      axios.get('/patients')
+        .then(response => {
+          const data = response.data;
+          let output = `
+            <table>
+              <tr>
+                <th>Patient ID</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Date of Birth</th>
+              </tr>`;
+          data.forEach(patient => {
+            output += `
+              <tr>
+                <td>${patient.patient_id}</td>
+                <td>${patient.first_name}</td>
+                <td>${patient.last_name}</td>
+                <td>${patient.date_of_birth}</td>
+              </tr>`;
+          });
+          output += `</table>`;
+          document.getElementById('data-output').innerHTML = output;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('data-output').innerHTML = 'Error fetching patients data.';
+        });
+    }
+
+    // Function to fetch providers
+    function fetchProviders() {
+      axios.get('/providers')
+        .then(response => {
+          const data = response.data;
+          let output = `
+            <table>
+              <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Specialty</th>
+              </tr>`;
+          data.forEach(provider => {
+            output += `
+              <tr>
+                <td>${provider.first_name}</td>
+                <td>${provider.last_name}</td>
+                <td>${provider.provider_specialty}</td>
+              </tr>`;
+          });
+          output += `</table>`;
+          document.getElementById('data-output').innerHTML = output;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('data-output').innerHTML = 'Error fetching providers data.';
+        });
+    }
+
+    // Function to fetch providers grouped by specialty
+    function fetchProvidersBySpecialty() {
+      axios.get('/providers/grouped-by-specialty')
+        .then(response => {
+          const data = response.data;
+          let output = `
+            <table>
+              <tr>
+                <th>Specialty</th>
+                <th>Providers</th>
+              </tr>`;
+          data.forEach(group => {
+            output += `
+              <tr>
+                <td>${group.provider_specialty}</td>
+                <td>${group.providers}</td>
+              </tr>`;
+          });
+          output += `</table>`;
+          document.getElementById('data-output').innerHTML = output;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('data-output').innerHTML = 'Error fetching providers by specialty data.';
+        });
+    }
+
+    // Function to fetch patient count by first name
+    function fetchPatientCountByFirstName() {
+      axios.get('/patients/count-by-first-name')
+        .then(response => {
+          const data = response.data;
+          let output = `
+            <table>
+              <tr>
+                <th>First Name</th>
+                <th>Patient Count</th>
+              </tr>`;
+          data.forEach(patient => {
+            output += `
+              <tr>
+                <td>${patient.first_name}</td>
+                <td>${patient.patient_count}</td>
+              </tr>`;
+          });
+          output += `</table>`;
+          document.getElementById('data-output').innerHTML = output;
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById('data-output').innerHTML = 'Error fetching patient count by first name data.';
+        });
+    }
+  </script>
+</body>
+</html>
